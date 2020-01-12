@@ -137,7 +137,7 @@ ChoiceScriptSavePlugin._delete_all = function () {
 	}, 3000);
 }
 
-ChoiceScriptSavePlugin._export = function (dateSlot, exportName, save_id) {
+ChoiceScriptSavePlugin._export = function (exportName, save_id) {
 	var saveItem = "";
 	saveItem = saveItem + "PS" + window.storeName.replace("_", "__") + "PSstate" + save_id + ":\"";
 	saveItem = saveItem + localStorage.getItem("PS" + window.storeName.replace("_", "__") + "PSstate" + save_id) + "\"";
@@ -167,7 +167,7 @@ ChoiceScriptSavePlugin._export = function (dateSlot, exportName, save_id) {
 	}, 0);
 }
 
-ChoiceScriptSavePlugin._export_all = function (dateSlot, saveName) {
+ChoiceScriptSavePlugin._export_all = function (saveName) {
 	var saves = ChoiceScriptSavePlugin._getSaveList();
 	var saveItem = "";
 	for (var i = 0; i < saves.length; i++) {
@@ -444,7 +444,7 @@ ChoiceScriptSavePlugin.export = function () {
 
 	alertify.prompt(message, function(e, exportName) {
 		if (e) {
-			ChoiceScriptSavePlugin._export(date.getTime(), exportName, select.value);
+			ChoiceScriptSavePlugin._export(exportName, select.value);
 		} else {
 			// user cancelled
 		}
