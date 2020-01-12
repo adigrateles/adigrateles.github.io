@@ -148,7 +148,7 @@ ChoiceScriptSavePlugin._export = function (dateSlot, exportName, save_id) {
 			return;
 		} else {
 			if ( saveData.temps._saveName != "" ) {
-				var saveName = saveData.temps._saveName;
+				saveName = saveData.temps._saveName;
 			}
 		}
 	});
