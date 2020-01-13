@@ -125,7 +125,7 @@ ChoiceScriptSavePlugin._delete = function (save_id) {
 
 ChoiceScriptSavePlugin._delete_all = function () {
 	var saves = ChoiceScriptSavePlugin._getSaveList();
-	for ( var i = 0; i < saves.length; i++) {
+	for (var i = 0; i < saves.length; i++) {
 		localStorage.removeItem("PS" + window.storeName.replace("_", "__") + "PSstate" + saves[i]);
 	}
 	setTimeout(function() {
@@ -152,22 +152,22 @@ ChoiceScriptSavePlugin._export = function (exportName, save_id) {
 			}
 		}
 	});
-	var textFile = new Blob( [saveItem] , { type: "text/plain;charset=utf-8" } );
+	var textFile = new Blob([saveItem], {type: "text/plain;charset=utf-8"});
 	// create pseudo-hyperlink
-	var a = document.createElement("a");
-	var url = URL.createObjectURL(textFile);
-	a.href = url;
-	a.download = ( exportName || ( window.storeName.replace("_", "__") + "_" + saveName ) ) + ".txt";
-	document.body.appendChild(a);
-	a.click();
+	var exportLink = document.createElement("a");
+	var textFileUrl = window.URL.createObjectURL(textFile);
+	exportLink.setAttribute("id", "exportLink");
+	exportLink.setAttribute("href", textFileUrl);
+	exportLink.setAttribute("download", (exportName || (window.storeName.replace("_", "__") + "_" + saveName)) + ".txt");
+	exportLink.click();
 	// remove hyperlink after use
-	setTimeout(function() {
-		document.body.removeChild(a);
-		window.URL.revokeObjectURL(url);
-	}, 0);
+	window.URL.revokeObjectURL(textFileUrl);
+	if (document.getElementById("exportLink")) {
+		document.getElementById("exportLink").remove();
+	};
 }
 
-ChoiceScriptSavePlugin._export_all = function (saveName) {
+ChoiceScriptSavePlugin._export_all = function (exportName) {
 	var saves = ChoiceScriptSavePlugin._getSaveList();
 	var saveItem = "";
 	for (var i = 0; i < saves.length; i++) {
@@ -175,19 +175,19 @@ ChoiceScriptSavePlugin._export_all = function (saveName) {
 		saveItem = saveItem + "PS" + window.storeName.replace("_", "__") + "PSstate" + saves[i] + ":\"";
 		saveItem = saveItem + localStorage.getItem("PS" + window.storeName.replace("_", "__") + "PSstate" + saves[i]) + "\"";
 	}
-	var textFile = new Blob( [saveItem] , { type: "text/plain;charset=utf-8" } );
+	var textFile = new Blob([saveItem], {type: "text/plain;charset=utf-8"});
 	// create pseudo-hyperlink
-	var a = document.createElement("a");
-	var url = URL.createObjectURL(textFile);
-	a.href = url;
-	a.download = ( saveName || ( window.storeName.replace("_", "__") + "_Saves" ) ) + ".txt";
-	document.body.appendChild(a);
-	a.click();
+	var exportLink = document.createElement("a");
+	var textFileUrl = window.URL.createObjectURL(textFile);
+	exportLink.setAttribute("id", "exportLink");
+	exportLink.setAttribute("href", textFileUrl);
+	exportLink.setAttribute("download", (exportName || (window.storeName.replace("_", "__") + "_Saves")) + ".txt");
+	exportLink.click();
 	// remove hyperlink after use
-	setTimeout(function() {
-		document.body.removeChild(a);
-		window.URL.revokeObjectURL(url);
-	}, 0);
+	window.URL.revokeObjectURL(textFileUrl);
+	if (document.getElementById("exportLink")) {
+		document.getElementById("exportLink").remove();
+	};
 }
 
 ChoiceScriptSavePlugin._import = function(textAreaValue) {
@@ -197,33 +197,33 @@ ChoiceScriptSavePlugin._import = function(textAreaValue) {
 	}
 	var saveLines = textAreaValue.split(/\r*\n/);
 	saveLines = saveLines.filter( function (line) {
-		return line != ( null || "" );
+		return line != (null || "");
 	});
 	var storeKey = "PS" + window.storeName.replace("_", "__") + "PSstate";
 	var	storeKeyLength = storeKey.length;
 	
 	var errorCheck = "";
-	for ( i = 0; i < saveLines.length; i++ ) {
-		if ( saveLines[i].substring( 0, storeKeyLength ) != storeKey ) {
+	for (i = 0; i < saveLines.length; i++) {
+		if (saveLines[i].substring(0, storeKeyLength) != storeKey) {
 			errorCheck = "Save line " + (i + 1) + " error: Save key does not match this game's store key!";
 			break;
 		}
 		else {
-			var saveSlotName = saveLines[i].substring( storeKeyLength, saveLines[i].indexOf(":") );
-			var saveSlotToken = saveLines[i].substring( saveLines[i].indexOf(":") + 2, saveLines[i].length - 1 );
+			var saveSlotName = saveLines[i].substring(storeKeyLength, saveLines[i].indexOf(":"));
+			var saveSlotToken = saveLines[i].substring(saveLines[i].indexOf(":") + 2, saveLines[i].length - 1);
 			saveSlotToken = saveSlotToken.replace(/^[^\{]*/, "");
 			saveSlotToken = saveSlotToken.replace(/[^\}]*$/, "");
 			var saveSlotState;
 			try {
-				saveSlotState = jsonParse( saveSlotToken );
+				saveSlotState = jsonParse(saveSlotToken);
 			} catch (e) {
 				errorCheck = "Save line " + (i + 1) + " error: Cannot parse save state!"
 				break;
 			}
-			saveCookie( function() {}, saveSlotName, saveSlotState.stats, saveSlotState.temps, saveSlotState.lineNum, saveSlotState.indent, this.debugMode, this.nav);
+			saveCookie(function() {}, saveSlotName, saveSlotState.stats, saveSlotState.temps, saveSlotState.lineNum, saveSlotState.indent, this.debugMode, this.nav);
 		}
 	}
-	if (errorCheck) {
+	if (errorCheck != (null || "")) {
 		alertify.error(errorCheck);
 	}
 	else {
@@ -459,9 +459,9 @@ ChoiceScriptSavePlugin.export_all = function () {
 	var date = new Date();
 	var message = "What would you like to call this export file?<br>Leaving this blank will result in a game identifier.";
 
-	alertify.prompt(message, function(e, saveName) {
+	alertify.prompt(message, function(e, exportName) {
 		if (e) {
-			ChoiceScriptSavePlugin._export_all(saveName);
+			ChoiceScriptSavePlugin._export_all(exportName);
 		} else {
 			// user cancelled
 		}
@@ -477,7 +477,9 @@ ChoiceScriptSavePlugin.import = function () {
 	
 	alertify.confirm(message, function(result) {
 		if (!result) {
-			document.getElementById("saveInput").remove();
+			if (document.getElementById("saveInput")) {
+				document.getElementById("saveInput").remove();
+			};
 			return;
 		} else {
 			ChoiceScriptSavePlugin._import(document.getElementById("saveInput").value);
