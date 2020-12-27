@@ -177,13 +177,22 @@ ChoiceScriptSavePlugin._export = function (exportName, saveId) {
     var saveItem = "";
     saveItem = saveItem + "PS" + window.storeName + "PSstate" + ChoiceScriptSavePlugin._formatSlotName(saveId) + ":\"";
     saveItem = saveItem + localStorage.getItem("PS" + window.storeName.replace(/_/g, "__") + "PSstate" + ChoiceScriptSavePlugin._formatSlotName(saveId).replace(/_/g, "__")) + "\"";
+    var saveName = "Save";
+    ChoiceScriptSavePlugin._getSaveData(saveId, function(saveData) {
+        if (!saveData) {
+            return;
+        }
+        if (saveData.stats._smSaveName !== "") {
+            saveName = saveData.stats._smSaveName;
+        }
+    });
     var textFile = new Blob([saveItem], {type: "text/plain;charset=utf-8"});
     // create pseudo-hyperlink
     var exportLink = document.createElement("a");
     var textFileUrl = window.URL.createObjectURL(textFile);
     exportLink.setAttribute("id", "exportLink");
     exportLink.setAttribute("href", textFileUrl);
-    exportLink.setAttribute("download", (exportName || (window.storeName + " - " + ChoiceScriptSavePlugin._formatSlotName(saveId))) + ".txt");
+    exportLink.setAttribute("download", (exportName || (window.storeName + " - " + saveName)) + ".txt");
     exportLink.click();
     // remove hyperlink after use
     window.URL.revokeObjectURL(textFileUrl);
@@ -248,11 +257,11 @@ ChoiceScriptSavePlugin._import = function(textAreaValue) {
                 errorCheck = "Save line " + (i + 1) + " error: Cannot parse save state!"
                 break;
             }
-			var saveId = saveSlotState.stats["_smSaveDateId"];
+            var saveId = saveSlotState.stats["_smSaveDateId"];
             ChoiceScriptSavePlugin._addToSaveList(saveId, function(success) {
                 if (!success)
                     return;
-				saveCookie(function() {}, saveSlotName, saveSlotState.stats, saveSlotState.temps, saveSlotState.lineNum, saveSlotState.indent, this.debugMode, this.nav);
+                saveCookie(function() {}, saveSlotName, saveSlotState.stats, saveSlotState.temps, saveSlotState.lineNum, saveSlotState.indent, this.debugMode, this.nav);
             });
         }
     }
@@ -272,7 +281,8 @@ ChoiceScriptSavePlugin._import = function(textAreaValue) {
 
 ChoiceScriptSavePlugin._createQuickSaveMenu = function() {
 
-    var p = document.getElementById("restartButton").parentElement;
+    // var p = document.getElementById("restartButton").parentElement;
+    var p = document.getElementById("buttons");
     if (!p) {
         alert("Error: unable to attach quick save menu");
         return;
