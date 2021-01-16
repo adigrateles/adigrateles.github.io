@@ -128,11 +128,11 @@ ChoiceSequenceLogPlugin._onFocusinEle = function (eventTarget) {
 			}
 			
 			// set log value for sequence log
-			checkedLogValue = checkedInput[0].value + " (" + checkedInput[0].nextSibling.data + ")";
+			checkedLogValue = checkedInput[0].value + " (" + checkedInput[0].parentElement.textContent + ")";
 			// loop through array starting from second value
 			for (var i = 1; i < checkedInput.length; i++) {
 				// add to current log value
-				checkedLogValue = checkedLogValue + ", " + checkedInput[i].value + " (" + checkedInput[i].nextSibling.data + ")";
+				checkedLogValue = checkedLogValue + ", " + checkedInput[i].value + " (" + checkedInput[i].parentElement.textContent + ")";
 			}
 		}
 	}
